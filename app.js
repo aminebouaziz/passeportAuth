@@ -6,14 +6,31 @@ const bodyParser = require("body-parser");
 
 const passport = require("passport");
 
-const mongo = require("mongodb");
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost//loginapp");
-const db = mongoose.connection();
 
 // init  App
 const app = express();
 
+// body parser middlerware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+//DB config
+const db = "mongodb://localhost:27017/loginapp";
+// routes
+const users = require("./routes/userAuth");
+app.use("/api/users", users);
+// Connect to MongoDB
+mongoose
+  .connect(db)
+  .then(() => console.log("MongoDB connected "))
+  .catch(err => console.log(err));
+
+//passport middleware
+app.use(passport.initialize());
+require("./models/User");
+//passeport config
+require("./config/passeport")(passport);
 // protected routes
 const key = "scretkey";
 
