@@ -20,8 +20,7 @@ router.get("/test", (req, res) => res.json({ msg: "Users works" }));
 router.post("/resgister", (req, res) => {
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      errors.email = "Email already exists";
-      return res.status(400).json(errors);
+      return res.status(400).json("Email already exists");
     } else {
       const newUser = new User({
         name: req.body.name,
@@ -31,7 +30,6 @@ router.post("/resgister", (req, res) => {
       // crypt password
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
           newUser.password = hash;
           newUser
             .save()
@@ -64,17 +62,12 @@ router.post("/login", (req, res) => {
         // User matched
         const payload = { id: user.id, name: user.name }; // create JWT payload
         // sign Token
-        jwt.sign(
-          payload,
-          keys.secretOrKey,
-          { expiresIn: 3600 },
-          (err, token) => {
-            res.json({
-              sucess: true,
-              token: "bearer " + token
-            });
-          }
-        );
+        jwt.sign(payload, keys.secretOrKey, (err, token) => {
+          res.json({
+            sucess: true,
+            token: "bearer " + token
+          });
+        });
       } else {
         errors.password = "Password incorrect";
         return res.status(400).json(errors);
